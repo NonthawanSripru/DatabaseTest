@@ -179,7 +179,6 @@
         return { text: e, value: e };
       });
       this.fieldlist = this.headers;
-      this.yearQuery = this.querys;
       this.customers = items;
       this.totalCustomers = total;
       this.loading = false;
