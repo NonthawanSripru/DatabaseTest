@@ -6,12 +6,9 @@
       <v-combobox
         v-model="xTable"
         :items="['Customers','Employees']"
-        label="Choose Table"
-        outlined
-        dense
-      ></v-combobox>
+       dense
+      />
     </v-card-title>
-
     <v-data-table
       :headers="headers"
       :items="desserts"
@@ -27,7 +24,10 @@
 </template>
 <script>
 const DW = "http://localhost:3000";
+import { msalMixin } from "vue-msal";
+const axios = require("axios").default;
 export default {
+  mixins: [msalMixin],
   data() {
     return {
       totalDesserts: 0,
@@ -56,6 +56,16 @@ export default {
     this.getDataFromApi();
   },
   methods: {
+    async calldata(xuri,opts){
+    let x = await this.$msal.acquireToken()
+    console.log(x)
+    const xdata = axios.create({
+        baseURL: "DW",
+        timeout: 1000,
+        headers: { "Authorization": `Bearer ${x.accessToken}` },
+      });
+    return await xdata.post(xuri,opts)
+    },
     async getDataFromApi() {
       this.loading = true;
       let xURL = DW+`/table/${this.xTable}`;
@@ -70,7 +80,8 @@ export default {
         xop.itemsPerPage = this.totalDesserts;
       }
 
-      let rest = await axios.post(xURL, xop);
+      let rest = await this.calldata(xURL, xop);
+      // let rest = {}
       if (rest.data) {
         let items = rest.data;
         this.desserts = items.value;
